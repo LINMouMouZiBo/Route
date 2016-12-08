@@ -17,17 +17,17 @@ public class Host {
     private static Lock lock = new ReentrantLock(true);
     private String localIP;
 
+    public static final int LISTENING_PORT = 4000;
+
     public Host() throws IOException {
         routeTable = new RouteTable();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("please input your IP address");
         localIP = br.readLine();
-        System.out.println("please input a port number as server port");
-        int port = Integer.valueOf(br.readLine());
 
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(LISTENING_PORT);
             // 监听键盘输入的命令
             new CommandHandler();
             // 监听邻居节点的连接请求
@@ -54,7 +54,6 @@ public class Host {
         lock.lock();
         for (HostChannel hc : connList) {
             try {
-                //oos.writeObject(b);
                 Logger.i("broadcast", "send to " + hc.getAddress());
                 hc.sendRouteTable(routeTable);
             } catch (Exception e) {
@@ -112,9 +111,9 @@ public class Host {
     private class ConnRequest extends Thread {
         private HostChannel neighbor;
 
-        public ConnRequest(String IP, int port, int distance) {
+        public ConnRequest(String IP, int distance) {
             try {
-                Socket socket = new Socket(IP, port);
+                Socket socket = new Socket(IP, LISTENING_PORT);
                 routeTable.updateTable(new RouteTable(localIP, IP, distance));
                 neighbor = new HostChannel(socket, true);
             } catch (Exception e) {
@@ -159,7 +158,6 @@ public class Host {
      */
     private class CommandHandler extends Thread {
         public CommandHandler() {
-            System.out.println("Please input neighbor's port to connect");
             start();
         }
 
@@ -169,12 +167,12 @@ public class Host {
 
             try {
                 while (true) {
+                    System.out.println("Please input neighbor's IP to connect");
                     String IP = br.readLine();
-                    int port = Integer.valueOf(br.readLine());
-
+                    System.out.println("Please input the distance between you and your neighbor");
                     int distance = Integer.valueOf(br.readLine());
 
-                    new ConnRequest(IP, port, distance);
+                    new ConnRequest(IP, distance);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
