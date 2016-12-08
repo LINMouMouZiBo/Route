@@ -1,10 +1,7 @@
 package Utils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class RouteTable implements Serializable {
@@ -54,12 +51,29 @@ public class RouteTable implements Serializable {
         for (String addr1: otherTable.keySet()) {
             for (String addr2: otherTable.get(addr1).keySet()) {
                 Integer distance = otherTable.get(addr1).get(addr2);
-                if (!distance.equals(table.get(addr1).get(addr2))) {
+                // 有更优的路径
+                if (distance < table.get(addr1).get(addr2)) {
                     table.get(addr1).put(addr2, distance);
                     changed = true;
                 }
             }
         }
+
+        // 确认是否为最优距离
+        Set<String> hosts = table.keySet();
+        for (String a : hosts) {
+            for (String b: hosts) {
+                if (a.equals(b)) continue;
+                for (String c: hosts) {
+                    if (b.equals(c)) continue;
+                    if (table.get(a).get(b) + table.get(b).get(c) < table.get(a).get(c)) {
+                        table.get(a).put(c, table.get(a).get(b) + table.get(b).get(c));
+                        changed = true;
+                    }
+                }
+            }
+        }
+
         return changed;
     }
 
