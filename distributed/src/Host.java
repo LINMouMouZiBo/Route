@@ -86,10 +86,10 @@ public class Host {
             try {
                 RouteTable rt = null;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(routeTable);
                     Logger.logRouteTable(rt, neighbor.getIP());
                     // 如果路由表有改动，广播新路由表
                     if (routeTable.updateTable(rt)) {
+                        Logger.logRouteTable(routeTable);
                         broadcast(neighbor.getIP());
                     }
                 }
@@ -134,10 +134,10 @@ public class Host {
 
                 RouteTable rt;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(routeTable);
                     Logger.logRouteTable(rt, neighbor.getIP());
                     // 如果路由表有改动，广播新路由表
                     if (routeTable.updateTable(rt)) {
+                        Logger.logRouteTable(routeTable);
                         broadcast(neighbor.getIP());
                     }
                 }
