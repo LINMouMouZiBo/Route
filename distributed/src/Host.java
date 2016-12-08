@@ -7,23 +7,24 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Host {
-    public static final int SERVER_PORT = 2016;
     private ServerSocket serverSocket = null;
     private List<HostChannel> connList = new ArrayList<>();
     private RouteTable routeTable;
     private static Lock lock = new ReentrantLock(true);
+    private String localIP;
 
     public Host() throws IOException {
         routeTable = new RouteTable();
 
-        Scanner keyboard = new Scanner(System.in);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("please input your IP address");
+        localIP = br.readLine();
         System.out.println("please input a port number as server port");
-        int port = keyboard.nextInt();
+        int port = Integer.valueOf(br.readLine());
 
         try {
             serverSocket = new ServerSocket(port);
@@ -86,8 +87,11 @@ public class Host {
             try {
                 RouteTable rt = null;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(rt, neighbor.getPort());
-                    // 更新路由表
+                    Logger.logRouteTable(rt, neighbor.getIP());
+                    // 如果路由表有改动，广播新路由表
+                    if (routeTable.updateTable(rt)) {
+                        broadcast(neighbor.getIP());
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -108,9 +112,10 @@ public class Host {
     private class ConnRequest extends Thread {
         private HostChannel neighbor;
 
-        public ConnRequest(String IP, int port) {
+        public ConnRequest(String IP, int port, int distance) {
             try {
                 Socket socket = new Socket(IP, port);
+                routeTable.updateTable(new RouteTable(localIP, IP, distance));
                 neighbor = new HostChannel(socket, true);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -125,12 +130,15 @@ public class Host {
         public void run() {
             try {
                 // 向邻居发送初始化的链路信息
-                broadcast(neighbor.getAddress());
+                broadcast(neighbor.getIP());
 
                 RouteTable rt;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(rt, neighbor.getPort());
-                    // 更新路由表
+                    Logger.logRouteTable(rt, neighbor.getIP());
+                    // 如果路由表有改动，广播新路由表
+                    if (routeTable.updateTable(rt)) {
+                        broadcast(neighbor.getIP());
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -158,13 +166,15 @@ public class Host {
         @Override
         public void run() {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            String str = null;
-            String neighborIP = "127.0.0.1";
+
             try {
                 while (true) {
-                    str = br.readLine();
-                    int port = Integer.valueOf(str);
-                    new ConnRequest(neighborIP, port);
+                    String IP = br.readLine();
+                    int port = Integer.valueOf(br.readLine());
+
+                    int distance = Integer.valueOf(br.readLine());
+
+                    new ConnRequest(IP, port, distance);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

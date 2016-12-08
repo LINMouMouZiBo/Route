@@ -6,9 +6,9 @@ import java.util.Date;
 public class Logger {
     private static SimpleDateFormat sd = new SimpleDateFormat("HH:mm:ss");
 
-    public static void logRouteTable(RouteTable rt, int port) {
+    public static void logRouteTable(RouteTable rt, String IP) {
         System.out.print(sd.format(new Date()));
-        System.out.println(" / Receive from " + port + ", text " + rt.getText());
+        System.out.println(" / Receive from " + IP + ", text " + rt.toString());
     }
 
     public static void i(String label, String text) {
