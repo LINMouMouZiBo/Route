@@ -33,7 +33,7 @@ public class Host {
             // 监听邻居节点的连接请求
             while (true) {
                 Socket socket = serverSocket.accept();
-                Logger.i("main", "about connecting to " + socket.getPort());
+                Logger.i("main", "about connecting to " + socket.getInetAddress());
                 new ConnRequestHandler(socket);
             }
         } catch (Exception e) {
@@ -86,6 +86,7 @@ public class Host {
             try {
                 RouteTable rt = null;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
+                    Logger.logRouteTable(routeTable);
                     Logger.logRouteTable(rt, neighbor.getIP());
                     // 如果路由表有改动，广播新路由表
                     if (routeTable.updateTable(rt)) {
@@ -133,6 +134,7 @@ public class Host {
 
                 RouteTable rt;
                 while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
+                    Logger.logRouteTable(routeTable);
                     Logger.logRouteTable(rt, neighbor.getIP());
                     // 如果路由表有改动，广播新路由表
                     if (routeTable.updateTable(rt)) {

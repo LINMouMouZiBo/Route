@@ -30,11 +30,11 @@ public class HostChannel {
     }
 
     public String getIP() {
-        return socket.getLocalAddress().toString();
+        return socket.getInetAddress().toString();
     }
 
     public int getPort() {
-        return socket.getLocalPort();
+        return socket.getPort();
     }
 
     public String getAddress() {

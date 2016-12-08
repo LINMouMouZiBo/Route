@@ -11,6 +11,11 @@ public class Logger {
         System.out.println(" / Receive from " + IP + ", text " + rt.toString());
     }
 
+    public static void logRouteTable(RouteTable rt) {
+        System.out.print(sd.format(new Date()));
+        System.out.println(" / RouteTable in this host" + rt.toString());
+    }
+
     public static void i(String label, String text) {
         System.out.println(sd.format(new Date()) + " / " + label + ": " + text);
     }
