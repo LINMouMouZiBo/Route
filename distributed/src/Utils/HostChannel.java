@@ -10,19 +10,15 @@ public class HostChannel {
     private ObjectInputStream ois = null;
     private Socket socket;
 
-    public HostChannel(Socket s, boolean isRequest) throws IOException {
+    public HostChannel(Socket s) throws IOException {
         this.socket = s;
-        if (isRequest) {
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
-            this.ois = new ObjectInputStream(socket.getInputStream());
-        } else {
-            this.ois = new ObjectInputStream(socket.getInputStream());
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
-        }
+        this.oos = new ObjectOutputStream(socket.getOutputStream());
+        this.ois = new ObjectInputStream(socket.getInputStream());
     }
 
     public void sendRouteTable (RouteTable rt) throws IOException {
         oos.writeObject(rt);
+        oos.flush();
     }
 
     public ObjectInputStream getOis() throws IOException {
