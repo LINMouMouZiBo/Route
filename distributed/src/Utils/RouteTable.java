@@ -1,5 +1,8 @@
 package Utils;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
@@ -98,5 +101,11 @@ public class RouteTable implements Serializable {
         }
         str += "==================================\n";
         return str;
+    }
+
+    public RouteTable deepClone() {
+        RouteTable clone = new RouteTable();
+        clone.updateTable(this);
+        return clone;
     }
 }
