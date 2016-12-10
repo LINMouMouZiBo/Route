@@ -44,23 +44,21 @@ public class Host {
     }
 
     /**
-     * 发送路由表至指定主机
-     * 1. 通过指定 IP, port 发送至主机
-     * 2. 除去某主机的广播
-     * 以上未实现
+     * 广播路由表
+     * 该方法同一时刻只会被一个线程调用
      * @param address `IP:port`
      */
-    private void broadcast(String address) {
-        lock.lock();
-        for (HostChannel hc : connList) {
-            try {
-                Logger.i("broadcast", "send to " + hc.getAddress());
-                hc.sendRouteTable(routeTable);
-            } catch (Exception e) {
-                e.printStackTrace();
+    private synchronized void broadcast(String address) {
+        synchronized (this) {
+            for (HostChannel hc : connList) {
+                try {
+                    RouteTable rt = routeTable.deepClone();
+                    hc.sendRouteTable(rt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-        lock.unlock();
     }
 
     /**
@@ -71,7 +69,7 @@ public class Host {
 
         public ConnRequestHandler(Socket socket) {
             try {
-                neighbor = new HostChannel(socket, false);
+                neighbor = new HostChannel(socket);
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -85,12 +83,18 @@ public class Host {
         public void run() {
             try {
                 RouteTable rt = null;
-                while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(rt, neighbor.getIP());
-                    // 如果路由表有改动，广播新路由表
-                    if (routeTable.updateTable(rt)) {
+                while (true) {
+                    rt = (RouteTable)neighbor.getOis().readObject();
+                    if (rt != null) {
+                        Logger.logRouteTable(rt, neighbor.getIP());
+                        // 如果路由表有改动，广播新路由表
+                        lock.lock();
+                        boolean isChanged = routeTable.updateTable(rt);
+                        lock.unlock();
+                        if (isChanged) {
+                           broadcast(neighbor.getIP());
+                        }
                         Logger.logRouteTable(routeTable);
-                        broadcast(neighbor.getIP());
                     }
                 }
             } catch (Exception e) {
@@ -115,8 +119,10 @@ public class Host {
         public ConnRequest(String IP, int distance) {
             try {
                 Socket socket = new Socket(IP, LISTENING_PORT);
+                lock.lock();
                 routeTable.updateTable(new RouteTable(localIP, IP, distance));
-                neighbor = new HostChannel(socket, true);
+                lock.unlock();
+                neighbor = new HostChannel(socket);
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -133,12 +139,19 @@ public class Host {
                 broadcast(neighbor.getIP());
 
                 RouteTable rt;
-                while ((rt = (RouteTable)(neighbor.getOis().readObject())) != null) {
-                    Logger.logRouteTable(rt, neighbor.getIP());
-                    // 如果路由表有改动，广播新路由表
-                    if (routeTable.updateTable(rt)) {
+                while (true) {
+                    rt = (RouteTable)neighbor.getOis().readObject();
+                    if (rt != null) {
+                        Logger.logRouteTable(rt, neighbor.getIP());
+                        // 如果路由表有改动，广播新路由表
+                        lock.lock();
+                        boolean isChanged = routeTable.updateTable(rt);
+                        lock.unlock();
+                        if (isChanged) {
+                            broadcast(neighbor.getIP());
+                        }
+
                         Logger.logRouteTable(routeTable);
-                        broadcast(neighbor.getIP());
                     }
                 }
             } catch (Exception e) {
@@ -169,12 +182,20 @@ public class Host {
 
             try {
                 while (true) {
-                    System.out.println("Please input neighbor's IP to connect");
-                    String IP = br.readLine();
-                    System.out.println("Please input the distance between you and your neighbor");
-                    int distance = Integer.valueOf(br.readLine());
+                    System.out.println("Please input command");
+                    String command = br.readLine();
+                    switch (command) {
+                        case "bye":
+                            // TODO
+                            break;
+                        default:
+                            System.out.println("Please input neighbor's IP to connect");
+                            String IP = br.readLine();
+                            System.out.println("Please input the distance between you and your neighbor");
+                            int distance = Integer.valueOf(br.readLine());
 
-                    new ConnRequest(IP, distance);
+                            new ConnRequest(IP, distance);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
