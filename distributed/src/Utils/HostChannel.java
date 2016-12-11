@@ -17,7 +17,13 @@ public class HostChannel {
     }
 
     public void sendRouteTable (RouteTable rt) throws IOException {
-        oos.writeObject(rt);
+        MsgPacket msgPacket = new MsgPacket(rt, "", 0);
+    	oos.writeObject(msgPacket);
+        oos.flush();
+    }
+    
+    public void sendMessage (MsgPacket msgPacket) throws IOException {
+    	oos.writeObject(msgPacket);
         oos.flush();
     }
 

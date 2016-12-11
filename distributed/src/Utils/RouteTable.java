@@ -79,6 +79,18 @@ public class RouteTable implements Serializable {
 
         return changed;
     }
+    
+    public String getNextRouteAddress(MsgPacket msgPacket, String currentIp) {
+		String resIP = "";
+		int minDis = Integer.MAX_VALUE;
+    	for (String addr1: table.get(currentIp).keySet()) {
+			if (minDis > table.get(currentIp).get(addr1) && table.get(currentIp).get(addr1) != 0) {
+				minDis = table.get(currentIp).get(addr1).intValue();
+				resIP = addr1;
+			}
+		}
+    	return resIP;
+	}
 
     @Override
     public String toString() {
