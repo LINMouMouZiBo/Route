@@ -19,4 +19,14 @@ public class Logger {
     public static void i(String label, String text) {
         System.out.println(sd.format(new Date()) + " / " + label + ": " + text);
     }
+    
+    public static void logMsgPacket(MsgPacket msg) {
+        System.out.print(sd.format(new Date()));
+        System.out.println(" / Message Packet in this host" + msg.toString());
+    }
+    
+    public static void logMsgPacket(MsgPacket msg, String IP) {
+        System.out.print(sd.format(new Date()));
+        System.out.println(" /packet Receive from " + IP + ", text " + msg.toString());
+    }
 }
