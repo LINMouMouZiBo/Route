@@ -79,7 +79,7 @@ public class Host {
 				ui.outputLabel.setText(msgPacket.getMessage());
 				return;
 			}
-			String nextIp = routeTable.getNextRouteAddress(msgPacket, localIP);
+			String nextIp = routeTable.getNextRouteAddress(msgPacket, localIP, connList);
 			for (HostChannel hc : connList) {
 				try {
 					String temString = hc.getIP();
