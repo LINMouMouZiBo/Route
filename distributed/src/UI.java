@@ -13,15 +13,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+
 import Utils.MsgPacket;
 
 public class UI {
-	// public JTextField connectIPInput = new JTextField();
-	// public JTextField distanceInput = new JTextField();
-	// public JTextField targetIPInput = new JTextField();
-	// public JTextField messageInput = new JTextField();
-	// public JLabel outputLabel = new JLabel("");
-	
 	public JTextField localHost;
 	public JButton sendDistance = new JButton("连接");
 	public JButton sendMessage = new JButton("发送");
@@ -37,11 +36,18 @@ public class UI {
 	
 	public UI(Host _host) {
 		host = _host;
+		//得到IP
 		localHost = new HintTextField(host.localIP);
 		go();
 	}
 
+	/**
+	 * 添加UI部件，容器:GridBagLayout
+	 *
+	 * @param
+	 */
 	public void go() {
+		//设置panel样式
 		jPanel.setBackground(Color.DARK_GRAY);
 		jPanel.setVisible(true);
 		jPanel.setLayout(gridBagLayout);
@@ -49,6 +55,7 @@ public class UI {
 		constraints.fill = GridBagConstraints.BOTH;
 		Font font = new Font("Microsoft Yahei", Font.ITALIC, 18);
 
+		//设置每一个部件的样式(宽度、边框、字体等)
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		constraints.weightx = 0;
 		localHost.setColumns(9);
@@ -122,7 +129,7 @@ public class UI {
 		logInfomation.setLineWrap(true);
 		logInfomation.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
 				230), new Color(195, 211, 230)));
-		logInfomation.setFont(font);
+		logInfomation.setFont(new Font("Microsoft Yahei", Font.PLAIN, 18));
 		logInfomation.setWrapStyleWord(true);
 		constraints.weighty = 1;
 		constraints.weightx = 1;
@@ -131,6 +138,7 @@ public class UI {
 		jPanel.add(logInfomation);
 		frame.add(jPanel);
 
+		//设置frame样式(适配屏幕、标题等)
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setSize((int)(dimension.width * 0.3), (int)(dimension.height * 0.9));
 		frame.setLocation((int)(dimension.width*0.35), 0);
@@ -141,52 +149,12 @@ public class UI {
 		sendMessage.addActionListener(new BtnListen2());
 
 		frame.setVisible(true);
-
-
-		// Font font = new Font("Arial", Font.BOLD, 25);
-		// connectIPInput.setFont(font);
-		// connectIPInput.setHorizontalAlignment(SwingConstants.CENTER);
-		// distanceInput.setFont(font);
-		// distanceInput.setHorizontalAlignment(SwingConstants.CENTER);
-		// targetIPInput.setFont(font);
-		// targetIPInput.setHorizontalAlignment(SwingConstants.CENTER);
-		// messageInput.setFont(font);
-		// messageInput.setHorizontalAlignment(SwingConstants.CENTER);
-		// JLabel equal = new JLabel("=");
-		// equal.setFont(font);
-		// equal.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-		// 		230), new Color(195, 211, 230)));
-		// equal.setHorizontalAlignment(SwingConstants.CENTER);
-
-		// JFrame frame = new JFrame("Route!");
-		// GridLayout gl = new GridLayout(3, 3, 10, 10);
-		// frame.setLayout(gl);
-		// frame.add(connectIPInput);
-		// frame.add(distanceInput);
-		// JButton btn1 = new JButton("connect");
-		// btn1.addActionListener(new BtnListen1());
-		// btn1.setFont(font);
-		// frame.add(btn1);
-
-		// frame.add(targetIPInput);
-		// frame.add(messageInput);
-		// JButton btn2 = new JButton("send");
-		// btn2.addActionListener(new BtnListen2());
-		// btn2.setFont(font);
-		// frame.add(btn2);
-
-		// font = font.deriveFont(2);
-		// outputLabel.setFont(font);
-		// outputLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		// frame.add(outputLabel);
-
-		// frame.setMinimumSize(new Dimension(900, 300));
-		// // frame.setBounds(0, 0, 10, 10);
-		// frame.pack();
-		// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// frame.setVisible(true);
 	}
 
+
+	/**
+	 * 添加与邻居Host连接的监听器
+	 */
 	class BtnListen1 implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -199,7 +167,7 @@ public class UI {
 			} else {
 				try {
 					int dis = Integer.parseInt(_distance);
-					host.creartConnet(IP, dis);
+					host.createConnet(IP, dis);
 					// JOptionPane.showMessageDialog(null,
 					// "Your have not decided which operation to perform!");
 				} catch (NumberFormatException exception) {
@@ -210,6 +178,9 @@ public class UI {
 		}
 	}
 
+	/**
+	 * 添加于某一Host通讯监听器
+	 */
 	class BtnListen2 implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -224,18 +195,38 @@ public class UI {
 			}
 		}
 	}
+
+	/**
+	 * 设置主机IP
+	 *
+	 * @param IP:用户输入主机地址
+	 */
+	public void setLocalIP(String IP) {
+		localHost.setText(IP);
+	}
 }
 
 class HintTextField extends JTextField implements FocusListener {
 	private final String hint;
 	private boolean showingHint;
 
+	/**
+	 * 新建带有提示信息的textField
+	 *
+	 * @param hint:提示信息
+	 */
 	public HintTextField(final String hint) {
 		super(hint);
 		this.hint = hint;
 		this.showingHint = true;
 		super.addFocusListener(this);
 	}
+
+	/**
+	 * 监听鼠标位置
+	 *
+	 * @param e:鼠标焦点获得事件
+	 */
 	@Override
 	public void focusGained(FocusEvent e) {
 		if(this.getText().isEmpty()) {
@@ -243,6 +234,12 @@ class HintTextField extends JTextField implements FocusListener {
 			showingHint = false;
 		}
 	}
+
+	/**
+	 * 监听鼠标位置
+	 *
+	 * @param e:鼠标焦点失去时间
+	 */
 	@Override
 	public void focusLost(FocusEvent e) {
 		if(this.getText().isEmpty()) {
@@ -250,6 +247,10 @@ class HintTextField extends JTextField implements FocusListener {
 			showingHint = true;
 		}
 	}
+
+	/**
+	 * 获取textField内容
+	 */
 	@Override
 	public String getText() {
 		return showingHint ? "" : super.getText();

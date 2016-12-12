@@ -20,7 +20,7 @@ public class Host {
 	public List<HostChannel> connList = new ArrayList<>();
 	public RouteTable routeTable;
 	private static Lock lock = new ReentrantLock(true);
-	public String localIP;
+	public String localIP = "";
 
 	public static final int LISTENING_PORT = 4000;
 
@@ -31,16 +31,15 @@ public class Host {
 			// 获得本机IP
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					System.in));
-			String s = logInfomation.getText();
-			ui.logInfomation.setText(s + "\n" + "please input your IP address\n");
+
 			System.out.println("please input your IP address");
 			localIP = br.readLine();
 			ui = new UI(this);
+			ui.setLocalIP(localIP);
 			// 监听邻居节点的连接请求
 			while (true) {
 				Socket socket = serverSocket.accept();
-				String s = logInfomation.getText();
-				ui.logInfomation.setText(s + "\n" + "about connecting to " + socket.getInetAddress() + "\n");
+				appendLogInfo("about connecting to " + socket.getInetAddress());
 				Logger.i("main",
 						"about connecting to " + socket.getInetAddress());
 				new ConnRequestHandler(socket);
@@ -80,8 +79,7 @@ public class Host {
 	public synchronized void sendMessagePacket(MsgPacket msgPacket) {
 		synchronized (this) {
 			if (msgPacket.getDesIP().equals(localIP)) {
-				String s = logInfomation.getText();
-				ui.logInfomation.setText(s + "\n" + msgPacket.getMessage() + "\n");
+				appendLogInfo(msgPacket.getMessage());
 				return;
 			}
 			String nextIp = routeTable.getNextRouteAddress(msgPacket, localIP, connList);
@@ -116,8 +114,7 @@ public class Host {
 				return;
 			}
 
-			String s = logInfomation.getText();
-			ui.logInfomation.setText(s + "\n" + "setup connection with " + neighbor.getAddress() + "\n");
+			appendLogInfo("setup connection with " + neighbor.getAddress());
 			Logger.i("requestHandler",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -180,8 +177,7 @@ public class Host {
 				return;
 			}
 
-			String s = logInfomation.getText();
-			ui.logInfomation.setText(s + "\n" + "setup connection with " + neighbor.getAddress() + "\n");
+			appendLogInfo("setup connection with " + neighbor.getAddress());
 			Logger.i("connRequest",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -229,14 +225,16 @@ public class Host {
 		}
 	}
 
-	public void creartConnet(String IP, int distance) {
+	public void createConnet(String IP, int distance) {
 		new ConnRequest(IP, distance);
 	}
 
+	public void appendLogInfo(String info) {
+		String original = ui.logInfomation.getText();
+		ui.logInfomation.setText(original + "\n" + info + "\n");
+	}
+
 	public static void main(String[] args) throws IOException {
-		String s = logInfomation.getText();
-		ui.logInfomation.setText(s + "\n" + "Host up" + "\n");
-		System.out.println("Host up");
 		new Host();
 	}
 
