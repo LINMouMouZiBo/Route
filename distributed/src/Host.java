@@ -35,7 +35,7 @@ public class Host {
 			System.out.println("please input your IP address");
 			localIP = br.readLine();
 			ui = new UI(this);
-			ui.setLocalIP(localIP);
+			ui.setLocalIP("本机IP:" + localIP);
 			// 监听邻居节点的连接请求
 			while (true) {
 				Socket socket = serverSocket.accept();

@@ -15,6 +15,7 @@ import javax.swing.SwingConstants;
 
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.border.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -48,7 +49,6 @@ public class UI {
 	 */
 	public void go() {
 		//设置panel样式
-		jPanel.setBackground(Color.DARK_GRAY);
 		jPanel.setVisible(true);
 		jPanel.setLayout(gridBagLayout);
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -61,8 +61,8 @@ public class UI {
 		localHost.setColumns(9);
 		localHost.setEnabled(false);
 		localHost.setFont(font);
-		localHost.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
+		localHost.setBorder(BorderFactory.createLineBorder(new Color(195, 211,
+                230), 1));
 		gridBagLayout.setConstraints(localHost, constraints);
 		jPanel.add(localHost);
 
@@ -73,12 +73,12 @@ public class UI {
 		jPanel.add(blank);
 
 		neighbour.setColumns(9);
-		neighbour.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
+		neighbour.setBorder(BorderFactory.createLineBorder(new Color(195, 211,
+                230), 1));
 		neighbourDis.setFont(font);
 		neighbourDis.setColumns(16);
-		neighbourDis.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
+		neighbourDis.setBorder(BorderFactory.createLineBorder(new Color(195, 211,
+                230), 1));
 		neighbour.setFont(font);
 		constraints.gridwidth = 1;
 		constraints.weightx = 2;
@@ -98,17 +98,17 @@ public class UI {
 
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		JTextField blank1 = new JTextField("");
-		blank.setEnabled(false);
+		blank1.setEnabled(false);
 		gridBagLayout.setConstraints(blank1, constraints);
 		jPanel.add(blank1);
 
 		otherHost.setColumns(9);
-		otherHost.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
+		otherHost.setBorder(BorderFactory.createLineBorder(new Color(195, 211,
+                230), 1));
 		otherHost.setFont(font);
 		message.setFont(font);
-		message.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
+		message.setBorder(BorderFactory.createLineBorder(new Color(195, 211,
+				230), 1));
 		message.setColumns(16);
 		constraints.gridwidth = 1;
 		constraints.weightx = 2;
@@ -127,9 +127,7 @@ public class UI {
 		jPanel.add(sendMessage);
 
 		logInfomation.setLineWrap(true);
-		logInfomation.setBorder(BorderFactory.createEtchedBorder(new Color(195, 211,
-				230), new Color(195, 211, 230)));
-		logInfomation.setFont(new Font("Microsoft Yahei", Font.PLAIN, 18));
+		logInfomation.setFont(new Font("Microsoft Yahei", Font.PLAIN, 16));
 		logInfomation.setWrapStyleWord(true);
 		constraints.weighty = 1;
 		constraints.weightx = 1;
