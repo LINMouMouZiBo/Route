@@ -39,7 +39,7 @@ public class Host {
 			// 监听邻居节点的连接请求
 			while (true) {
 				Socket socket = serverSocket.accept();
-				appendLogInfo("about connecting to " + socket.getInetAddress());
+				ui.appendLogInfo("about connecting to " + socket.getInetAddress());
 				Logger.i("main",
 						"about connecting to " + socket.getInetAddress());
 				new ConnRequestHandler(socket);
@@ -79,7 +79,7 @@ public class Host {
 	public synchronized void sendMessagePacket(MsgPacket msgPacket) {
 		synchronized (this) {
 			if (msgPacket.getDesIP().equals(localIP)) {
-				appendLogInfo(msgPacket.getMessage());
+				ui.appendLogInfo(msgPacket.getMessage());
 				return;
 			}
 			String nextIp = routeTable.getNextRouteAddress(msgPacket, localIP, connList);
@@ -114,7 +114,7 @@ public class Host {
 				return;
 			}
 
-			appendLogInfo("setup connection with " + neighbor.getAddress());
+			ui.appendLogInfo("setup connection with " + neighbor.getAddress());
 			Logger.i("requestHandler",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -177,7 +177,7 @@ public class Host {
 				return;
 			}
 
-			appendLogInfo("setup connection with " + neighbor.getAddress());
+			ui.appendLogInfo("setup connection with " + neighbor.getAddress());
 			Logger.i("connRequest",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -227,11 +227,6 @@ public class Host {
 
 	public void createConnet(String IP, int distance) {
 		new ConnRequest(IP, distance);
-	}
-
-	public void appendLogInfo(String info) {
-		String original = ui.logInfomation.getText();
-		ui.logInfomation.setText(original + "\n" + info + "\n");
 	}
 
 	public static void main(String[] args) throws IOException {
