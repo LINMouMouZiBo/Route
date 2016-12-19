@@ -89,6 +89,7 @@ public class RouteTable implements Serializable {
 		int minDis = Integer.MAX_VALUE;
 		for (int i = 0; i < connList.size(); i++) {
 			String negIp = connList.get(i).getIP();
+			Logger.logMsgPacket(msgPacket);
 			if (minDis > table.get(negIp).get(msgPacket.getDesIP())
 					+ table.get(currentIp).get(negIp)) {
 				minDis = table.get(negIp).get(msgPacket.getDesIP())

@@ -32,7 +32,11 @@ public class HostChannel {
     }
 
     public String getIP() {
-        return socket.getInetAddress().toString();
+    	String temString = socket.getInetAddress().toString();
+		if (temString.charAt(0) == '/') {
+			temString = temString.substring(1);
+		}
+        return temString;
     }
 
     public int getPort() {
