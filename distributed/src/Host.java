@@ -12,6 +12,8 @@ import Utils.HostChannel;
 import Utils.Logger;
 import Utils.MsgPacket;
 import Utils.RouteTable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Host {
 	public UI ui;
@@ -23,6 +25,7 @@ public class Host {
 	public String localIP = "";
 
 	public static final int LISTENING_PORT = 4000;
+	private static SimpleDateFormat sd = new SimpleDateFormat("HH:mm:ss");
 
 	public Host() throws IOException {
 		routeTable = new RouteTable();
@@ -39,7 +42,7 @@ public class Host {
 			// 监听邻居节点的连接请求
 			while (true) {
 				Socket socket = serverSocket.accept();
-				ui.appendLogInfo("about connecting to " + socket.getInetAddress());
+				ui.appendLogInfo(sd.format(new Date()) + " / " + "main" + ": " + "about connecting to " + socket.getInetAddress());
 				Logger.i("main",
 						"about connecting to " + socket.getInetAddress());
 				new ConnRequestHandler(socket);
@@ -114,7 +117,7 @@ public class Host {
 				return;
 			}
 
-			ui.appendLogInfo("setup connection with " + neighbor.getAddress());
+			ui.appendLogInfo(sd.format(new Date()) + " / " + "requestHandler" + ": " + "setup connection with " + neighbor.getAddress());
 			Logger.i("requestHandler",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -129,6 +132,8 @@ public class Host {
 					msgPacket = (MsgPacket) neighbor.getOis().readObject();
 					if (msgPacket != null) {
 						if (msgPacket.getType() == 0) { // 收到的是路由表
+							ui.appendRouteInfo(sd.format(new Date()));
+							ui.appendRouteInfo(" / Receive from " + neighbor.getIP() + ", text " + msgPacket.getRouteTable().toString());
 							Logger.logRouteTable(msgPacket.getRouteTable(),
 									neighbor.getIP());
 							// 如果路由表有改动，广播新路由表
@@ -139,9 +144,13 @@ public class Host {
 							if (isChanged) {
 								broadcast(neighbor.getIP());
 							}
+
+
 							// Logger.logRouteTable(routeTable);
 						} else { // 收到的是信息包
 							sendMessagePacket(msgPacket);
+							ui.appendLogInfo(sd.format(new Date()));
+							ui.appendLogInfo(" /packet Receive from " + neighbor.getIP() + ", text " + msgPacket.toString());
 							Logger.logMsgPacket(msgPacket, neighbor.getIP());
 						}
 					}
@@ -177,7 +186,7 @@ public class Host {
 				return;
 			}
 
-			ui.appendLogInfo("setup connection with " + neighbor.getAddress());
+			ui.appendLogInfo(sd.format(new Date()) + " / " + "connRequest" + ": " + "setup connection with " + neighbor.getAddress());
 			Logger.i("connRequest",
 					"setup connection with " + neighbor.getAddress());
 			connList.add(neighbor);
@@ -195,6 +204,8 @@ public class Host {
 					msgPacket = (MsgPacket) neighbor.getOis().readObject();
 					if (msgPacket != null) {
 						if (msgPacket.getType() == 0) { // 收到的是路由表
+							ui.appendRouteInfo(sd.format(new Date()));
+							ui.appendRouteInfo(" / Receive from " + neighbor.getIP() + ", text " + msgPacket.getRouteTable());
 							Logger.logRouteTable(msgPacket.getRouteTable(),
 									neighbor.getIP());
 							// 如果路由表有改动，广播新路由表
@@ -208,6 +219,8 @@ public class Host {
 							// Logger.logRouteTable(routeTable);
 						} else { // 收到的是信息包
 							sendMessagePacket(msgPacket);
+							ui.appendLogInfo(sd.format(new Date()));
+							ui.appendLogInfo(" /packet Receive from " + neighbor.getIP() + ", text " + msgPacket.toString());
 							Logger.logMsgPacket(msgPacket, neighbor.getIP());
 						}
 					}
