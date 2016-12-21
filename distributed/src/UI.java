@@ -30,7 +30,8 @@ public class UI {
 	public JTextField otherHost = new HintTextField("其他主机IP");
 	public JTextField message = new HintTextField("发送消息");
 	public JFrame frame = new JFrame();
-	public JTextArea logInfomation = new JTextArea("路由log:\n");
+	public JTextArea logInfomation = new JTextArea("连接状态log:\n");
+	public JTextArea routeInformation = new JTextArea("路由信息log:\n");
 	public JPanel jPanel = new JPanel();
 	public GridBagLayout gridBagLayout = new GridBagLayout();
 	public Host host;
@@ -64,15 +65,34 @@ public class UI {
 		jPanel.add(button);
 	}
 
-	public void setTextAreaStyle(JTextArea textArea, GridBagConstraints constraints, int gridwidth, int weightx, int weighty) {
-		textArea.setLineWrap(true);
-		textArea.setFont(new Font("Microsoft Yahei", Font.PLAIN, 16));
-		textArea.setWrapStyleWord(true);
-		constraints.weighty = weighty;
-		constraints.weightx = weightx;
-		constraints.gridwidth = gridwidth;
-		gridBagLayout.setConstraints(textArea, constraints);
-		jPanel.add(textArea);
+	public void setTextAreaStyle(JTextArea textArea, GridBagConstraints constraints, int gridwidth, int weightx, int weighty, int flag) {
+		if (flag == 1) {
+			textArea.setLineWrap(true);
+			textArea.setFont(new Font("Microsoft Yahei", Font.PLAIN, 16));
+			textArea.setWrapStyleWord(true);
+			JScrollPane scroll = new JScrollPane(textArea);
+			scroll.setHorizontalScrollBarPolicy(
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scroll.setVerticalScrollBarPolicy(
+					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			constraints.weighty = weighty;
+			constraints.weightx = weightx;
+			constraints.gridwidth = gridwidth;
+			gridBagLayout.setConstraints(scroll, constraints);
+
+			jPanel.add(scroll);
+		} else {
+			textArea.setLineWrap(true);
+			textArea.setFont(new Font("Microsoft Yahei", Font.PLAIN, 16));
+			textArea.setWrapStyleWord(true);
+
+			constraints.weighty = weighty;
+			constraints.weightx = weightx;
+			constraints.gridwidth = gridwidth;
+			gridBagLayout.setConstraints(textArea, constraints);
+
+			jPanel.add(textArea);
+		}
 	}
 
 	/**
@@ -94,7 +114,7 @@ public class UI {
 
 		JTextArea blank = new JTextArea("");
 		blank.setEnabled(false);
-		setTextAreaStyle(blank, constraints, GridBagConstraints.REMAINDER, 0, 0);
+		setTextAreaStyle(blank, constraints, GridBagConstraints.REMAINDER, 0, 0, 0);
 
 		setTextFieldStyle(neighbour, constraints, 1, 2, 0);
 		setTextFieldStyle(neighbourDis, constraints, 2, 1, 0);
@@ -102,13 +122,14 @@ public class UI {
 
 		JTextArea blank1 = new JTextArea("");
 		blank1.setEnabled(false);
-		setTextAreaStyle(blank1, constraints, GridBagConstraints.REMAINDER, 0, 0);
+		setTextAreaStyle(blank1, constraints, GridBagConstraints.REMAINDER, 0, 0, 0);
 		
 		setTextFieldStyle(otherHost, constraints, 1, 2, 0);
 		setTextFieldStyle(message, constraints, 2, 1, 0);
 		setButtonStyle(sendMessage, constraints, GridBagConstraints.REMAINDER, 0, 0);
 
-		setTextAreaStyle(logInfomation, constraints, GridBagConstraints.REMAINDER, 1, 1);
+		setTextAreaStyle(logInfomation, constraints, GridBagConstraints.REMAINDER, 1, 1, 1);
+		setTextAreaStyle(routeInformation, constraints, GridBagConstraints.REMAINDER, 1, 1, 1);
 		frame.add(jPanel);
 
 		//设置frame样式(适配屏幕、标题等)
@@ -121,12 +142,18 @@ public class UI {
 		sendDistance.addActionListener(new BtnListen1());
 		sendMessage.addActionListener(new BtnListen2());
 
+
 		frame.setVisible(true);
 	}
 
 	public void appendLogInfo(String info) {
 		String original = logInfomation.getText();
 		logInfomation.setText(original + "\n" + info + "\n");
+	}
+
+	public void appendRouteInfo(String info) {
+		String original = routeInformation.getText();
+		routeInformation.setText(original + "\n" + info + "\n");
 	}
 
 
